@@ -3,7 +3,13 @@
  */
 package uas.facerecognition.lblda.lib;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import uas.facerecognition.lblda.lib.util.ImageIO;
 
 /**
  * @author arunv
@@ -11,7 +17,9 @@ import java.util.List;
  */
 public class Sample {
 
-	private List<Float> data;
+	static Logger logger = LoggerFactory.getLogger(Sample.class);
+
+	private List<Double> data;
 
 	private String fileName;
 	private String className;
@@ -22,10 +30,14 @@ public class Sample {
 
 	}
 
+	public Sample(String className) {
+		this.className = className;
+	}
+
 	/**
 	 * @return the data
 	 */
-	public List<Float> getData() {
+	public List<Double> getData() {
 		return data;
 	}
 
@@ -33,8 +45,12 @@ public class Sample {
 	 * @param data
 	 *            the data to set
 	 */
-	public void setData(List<Float> data) {
+	public void setData(List<Double> data) {
 		this.data = data;
+	}
+
+	public int getDataSize() {
+		return this.data.size();
 	}
 
 	/**
@@ -67,7 +83,34 @@ public class Sample {
 		this.className = className;
 	}
 
+	public void initAndSetDataSize(int size) {
+		this.data = new ArrayList<>(size);
+	}
+
+	public double getDataOfIndex(int index) {
+		return this.data.get(index);
+	}
+
+	public void addData(double value) {
+		this.data.add(value);
+	}
+
+	public void addData(double value, int index) {
+		this.data.add(index, value);
+	}
+
 	public boolean load(String fileName, String className, int width, int height) {
+
+		this.fileName = fileName;
+		this.className = className;
+		this.width = width;
+		this.height = height;
+		this.data = new ImageIO(fileName, width, height).getGreyImageData();
+
+		if (this.data == null) {
+			logger.debug(fileName + ": not able to get GreyImageData");
+			return false;
+		}
 
 		return true;
 	}

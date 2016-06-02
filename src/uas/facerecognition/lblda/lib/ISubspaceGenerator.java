@@ -9,5 +9,5 @@ package uas.facerecognition.lblda.lib;
  */
 public interface ISubspaceGenerator {
 
-	int generateSubspace();
+	Subspace generateSubspace(SampleContainer container);
 }

@@ -10,30 +10,40 @@ import java.util.List;
  * @author arunv
  *
  */
-public class RegionDescription {
-	private List<Long> indices;
+public class RegionDescriptor {
+	private List<Integer> indices;
 
-	public RegionDescription() {
+	public RegionDescriptor() {
 		indices = new ArrayList<>();
 	}
 
 	/**
 	 * @return the indices
 	 */
-	public List<Long> getIndices() {
+	public List<Integer> getIndices() {
 		return indices;
+	}
+
+	public int getIndexFromList(int index) {
+		return this.indices.get(index);
 	}
 
 	/**
 	 * @param indices
 	 *            the indices to set
 	 */
-	public void setIndices(List<Long> indices) {
+	public void setIndices(List<Integer> indices) {
 		this.indices = indices;
 	}
 
-	public void inIt(long originalWidth, long originalHeight, long localWidth, long posX, long posY) {
-		long minx, miny, maxx, maxy;
+	public int getsize() {
+		if (this.indices != null)
+			return this.indices.size();
+		return 0;
+	}
+
+	public void initDescriptor(int originalWidth, int originalHeight, int localWidth, int posX, int posY) {
+		int minx, miny, maxx, maxy;
 		minx = posX;
 		miny = posY;
 		maxx = posX + localWidth;
@@ -44,7 +54,7 @@ public class RegionDescription {
 		if (maxy > originalHeight)
 			maxy = originalHeight;
 
-		long x, y;
+		int x, y;
 		for (y = miny; y < maxy; y++) {
 			for (x = minx; x < maxx; x++) {
 				indices.add(y * originalWidth + x);

@@ -1,0 +1,56 @@
+DEBUG main uas.facerecognition.lblda.Main - OpenCV library loaded successfully
+INFO main uas.facerecognition.lblda.Main - Training started..
+DEBUG main uas.facerecognition.lblda.LBLDATrainer - 13233
+INFO main uas.facerecognition.lblda.LBLDATrainer - Creating Subspace
+INFO main uas.facerecognition.lblda.lib.local.LocalSubspaceGenerator - Generating Subspace
+INFO main uas.facerecognition.lblda.lib.local.LocalSubspaceGenerator - init Local Descriptor
+DEBUG main uas.facerecognition.lblda.Main - OpenCV library loaded successfully
+INFO main uas.facerecognition.lblda.Main - Training started..
+DEBUG main uas.facerecognition.lblda.LBLDATrainer - 13233
+INFO main uas.facerecognition.lblda.LBLDATrainer - Creating Subspace
+INFO main uas.facerecognition.lblda.lib.local.LocalSubspaceGenerator - Generating Subspace
+INFO main uas.facerecognition.lblda.lib.local.LocalSubspaceGenerator - init Local Descriptor
+DEBUG main uas.facerecognition.lblda.lib.local.LocalSubspaceGenerator - LocalDescriptor size :8
+INFO main uas.facerecognition.lblda.lib.local.LocalSubspaceGenerator - Creating Local subspaces for regions
+DEBUG main uas.facerecognition.lblda.Main - OpenCV library loaded successfully
+INFO main uas.facerecognition.lblda.Main - Training started..
+DEBUG main uas.facerecognition.lblda.LBLDATrainer - 13233
+INFO main uas.facerecognition.lblda.LBLDATrainer - Creating Subspace
+INFO main uas.facerecognition.lblda.lib.local.LocalSubspaceGenerator - Generating Subspace
+INFO main uas.facerecognition.lblda.lib.local.LocalSubspaceGenerator - init Local Descriptor
+DEBUG main uas.facerecognition.lblda.lib.local.LocalSubspaceGenerator - LocalDescriptor size :8
+INFO main uas.facerecognition.lblda.lib.local.LocalSubspaceGenerator - Creating Local subspaces for regions
+DEBUG main uas.facerecognition.lblda.Main - OpenCV library loaded successfully
+INFO main uas.facerecognition.lblda.Main - Training started..
+DEBUG main uas.facerecognition.lblda.LBLDATrainer - 13233
+INFO main uas.facerecognition.lblda.LBLDATrainer - Creating Subspace
+INFO main uas.facerecognition.lblda.lib.local.LocalSubspaceGenerator - Generating Subspace
+INFO main uas.facerecognition.lblda.lib.local.LocalSubspaceGenerator - init Local Descriptor
+DEBUG main uas.facerecognition.lblda.lib.local.LocalSubspaceGenerator - LocalDescriptor size :8
+INFO main uas.facerecognition.lblda.lib.local.LocalSubspaceGenerator - Creating Local subspaces for regions
+DEBUG main uas.facerecognition.lblda.lib.local.LocalSubspaceGenerator - Generating Subspace for DescriptorIndex:0. Total sample size: 13233
+DEBUG main uas.facerecognition.lblda.lib.local.LocalSubspaceGenerator - Generating Subspace for DescriptorIndex:1. Total sample size: 13233
+DEBUG main uas.facerecognition.lblda.lib.local.LocalSubspaceGenerator - Generating Subspace for DescriptorIndex:2. Total sample size: 13233
+DEBUG main uas.facerecognition.lblda.lib.local.LocalSubspaceGenerator - Generating Subspace for DescriptorIndex:3. Total sample size: 13233
+DEBUG main uas.facerecognition.lblda.lib.local.LocalSubspaceGenerator - Generating Subspace for DescriptorIndex:4. Total sample size: 13233
+DEBUG main uas.facerecognition.lblda.lib.local.LocalSubspaceGenerator - Generating Subspace for DescriptorIndex:5. Total sample size: 13233
+DEBUG main uas.facerecognition.lblda.lib.local.LocalSubspaceGenerator - Generating Subspace for DescriptorIndex:6. Total sample size: 13233
+DEBUG main uas.facerecognition.lblda.lib.local.LocalSubspaceGenerator - Generating Subspace for DescriptorIndex:7. Total sample size: 13233
+INFO main uas.facerecognition.lblda.lib.local.LocalSubspaceGenerator - mearging Local subspaces of regions
+DEBUG main uas.facerecognition.lblda.Main - OpenCV library loaded successfully
+INFO main uas.facerecognition.lblda.Main - Training started..
+DEBUG main uas.facerecognition.lblda.LBLDATrainer - Total samples loaded in to system: 13233
+INFO main uas.facerecognition.lblda.LBLDATrainer - Creating Subspace
+INFO main uas.facerecognition.lblda.lib.local.LocalSubspaceGenerator - Generating Subspace
+INFO main uas.facerecognition.lblda.lib.local.LocalSubspaceGenerator - init Local Descriptor
+DEBUG main uas.facerecognition.lblda.lib.local.LocalSubspaceGenerator - LocalDescriptor size :8
+INFO main uas.facerecognition.lblda.lib.local.LocalSubspaceGenerator - Creating Local subspaces for regions
+DEBUG main uas.facerecognition.lblda.lib.local.LocalSubspaceGenerator - Generating Subspace for DescriptorIndex:0. Total sample size: 13233
+DEBUG main uas.facerecognition.lblda.lib.local.LocalSubspaceGenerator - Generating Subspace for DescriptorIndex:1. Total sample size: 13233
+DEBUG main uas.facerecognition.lblda.lib.local.LocalSubspaceGenerator - Generating Subspace for DescriptorIndex:2. Total sample size: 13233
+DEBUG main uas.facerecognition.lblda.lib.local.LocalSubspaceGenerator - Generating Subspace for DescriptorIndex:3. Total sample size: 13233
+DEBUG main uas.facerecognition.lblda.lib.local.LocalSubspaceGenerator - Generating Subspace for DescriptorIndex:4. Total sample size: 13233
+DEBUG main uas.facerecognition.lblda.lib.local.LocalSubspaceGenerator - Generating Subspace for DescriptorIndex:5. Total sample size: 13233
+DEBUG main uas.facerecognition.lblda.lib.local.LocalSubspaceGenerator - Generating Subspace for DescriptorIndex:6. Total sample size: 13233
+DEBUG main uas.facerecognition.lblda.lib.local.LocalSubspaceGenerator - Generating Subspace for DescriptorIndex:7. Total sample size: 13233
+INFO main uas.facerecognition.lblda.lib.local.LocalSubspaceGenerator - mearging Local subspaces of regions
