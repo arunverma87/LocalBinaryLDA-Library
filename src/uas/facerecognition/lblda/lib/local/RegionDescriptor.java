@@ -3,6 +3,7 @@
  */
 package uas.facerecognition.lblda.lib.local;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +11,10 @@ import java.util.List;
  * @author arunv
  *
  */
-public class RegionDescriptor {
+public class RegionDescriptor implements Serializable {
+
+	private static final transient long serialVersionUID = 1L;
+
 	private List<Integer> indices;
 
 	public RegionDescriptor() {

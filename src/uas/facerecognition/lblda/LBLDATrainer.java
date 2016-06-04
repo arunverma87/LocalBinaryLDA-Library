@@ -3,6 +3,12 @@
  */
 package uas.facerecognition.lblda;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +36,7 @@ public class LBLDATrainer {
 
 	private SampleContainer trainSamples;
 
-	private LocalSubspace localSubspace;
+	private LocalSubspace localSubspace = null;
 
 	public LBLDATrainer(String imageFilePath, int imageWidth, int imageHeight, int stepSize, int windowSize,
 			int pcaDimension, int outputDimension) {
@@ -64,7 +70,7 @@ public class LBLDATrainer {
 				windowSize, stepSize, outputDimension);
 
 		// generate subspace
-		localSubspace = localSubpaceGenerator.generateSubspace(trainSamples);
+		this.localSubspace = localSubpaceGenerator.generateSubspace(trainSamples);
 
 		subGenerator = null;
 
@@ -72,6 +78,24 @@ public class LBLDATrainer {
 
 	public void saveSubSpace() {
 
+		String savePath = this.imageFilePath.substring(0, this.imageFilePath.lastIndexOf(".")) + ".dat";
+		serializeData(savePath);
 	}
 
+	public void serializeData(String path) {
+		System.out.println("Starting serialization...");
+		try {
+			FileOutputStream fileOut = new FileOutputStream(path);
+			ObjectOutputStream out = new ObjectOutputStream(fileOut);
+			out.writeObject(this.localSubspace);
+			out.close();
+			fileOut.close();
+			System.out.println("Serialization Successful... Checkout " + path + " output file..");
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 }

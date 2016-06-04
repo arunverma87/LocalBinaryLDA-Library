@@ -4,6 +4,7 @@
 package uas.facerecognition.lblda.lib.local;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -78,7 +79,7 @@ public class LocalSubspaceGenerator {
 			int nstepsx = (originalWidth - windowWidth) / windowStep + 1;
 			int nstepsy = (originalHeight - windowWidth) / windowStep + 1;
 
-			localSubspace.setLocalDescriptorListSize(nstepsx * nstepsy);
+			// localSubspace.setLocalDescriptorListSize(nstepsx * nstepsy);
 
 			int x, y;
 			y = 0;
@@ -89,6 +90,8 @@ public class LocalSubspaceGenerator {
 					RegionDescriptor descriptor = new RegionDescriptor();
 					descriptor.initDescriptor(originalWidth, originalHeight, windowWidth, x, y);
 					localSubspace.addDescriptor(descriptor);
+					// localSubspace.setDescriptor((i * nstepsy) + j,
+					// descriptor);
 					x += windowStep;
 				}
 				y += windowStep;
@@ -106,19 +109,24 @@ public class LocalSubspaceGenerator {
 		try {
 			if (localSubspaces != null) {
 
-				localSubspaces.setLocalSubspaceListSize(localSubspaces.getLocalDescriptorListSize());
+				// localSubspaces.setLocalSubspaceListSize(localSubspaces.getLocalDescriptorListSize());
 				SampleContainer localContainer = null;
 				Subspace subspace = null;
+				int numLocalDescriptors = localSubspaces.getLocalDescriptorListSize();
+				int numOriginalSamples = originalSampleSet.getSize();
 
-				for (int i = 0; i < localSubspaces.getLocalDescriptorListSize(); i++) {
+				for (int i = 0; i < numLocalDescriptors; i++) {
 					localContainer = new SampleContainer();
-					for (int j = 0; j < originalSampleSet.getSize(); j++) {
+					for (int j = 0; j < numOriginalSamples; j++) {
+
 						Sample sample = createLocalSample(originalSampleSet.getSample(j),
 								localSubspaces.getLocalDescriptor(i));
 						localContainer.addSample(sample);
+
 					}
 
-					logger.debug("Generating Subspace for DescriptorIndex:" + i + ". Total sample size: " + localContainer.getSize());
+					logger.debug("Generating Subspace for DescriptorIndex:" + i + ". Total sample size: "
+							+ localContainer.getSize());
 
 					subspace = this.subspaceGenerator.generateSubspace(localContainer);
 					localSubspaces.addSubspace(subspace);
@@ -131,8 +139,45 @@ public class LocalSubspaceGenerator {
 	}
 
 	private void mergeSubspaces(LocalSubspace localSubspaces) throws CustomException {
-
 		try {
+
+			long total = 0;
+			int numLocalDescriptors = localSubspaces.getLocalDescriptorListSize();
+			int numLocalSubspaces = localSubspaces.getLocalSubspaceListSize();
+			long numfeatures;
+			List<LocalFeature> featuresList = new ArrayList<>();
+
+			for (int i = 0; i < numLocalDescriptors; i++) {
+				total += localSubspaces.getLocalSubspace(i).getSubspaceDim();
+			}
+
+			numfeatures = total;
+			LocalFeature feature = null;
+
+			for (int i = 0; i < numLocalSubspaces; i++) {
+				for (int j = 0; j < localSubspaces.getLocalSubspace(i).getSubspaceDim(); j++) {
+					feature = new LocalFeature();
+					feature.setRegionDescriptorIndex(i);
+					feature.setSubspaceindex(i);
+					feature.setAxisindex(j);
+					feature.setValue(Math.abs(localSubspaces.getLocalSubspace(i).getAxesCriterionFn().get(j)));
+					featuresList.add(feature);
+				}
+			}
+
+			LocalFeatureComparator comparator = new LocalFeatureComparator();
+			Collections.sort(featuresList, comparator);
+
+			if (this.numFeatures < numfeatures)
+				numfeatures = this.numFeatures;
+
+			if (featuresList.size() < this.numFeatures) {
+				for (int i = 0; i < (this.numFeatures - featuresList.size()); i++)
+					featuresList.add(null);
+			} else if (featuresList.size() > this.numFeatures) {
+				featuresList = featuresList.subList(0, this.numFeatures);
+			}
+			localSubspaces.setLocalFeatureList(featuresList);
 
 		} catch (Exception ex) {
 			throw new CustomException("Excpetion while mearging localsubspace of regions", ex);

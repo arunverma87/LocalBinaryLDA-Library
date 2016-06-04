@@ -95,8 +95,12 @@ public class Sample {
 		this.data.add(value);
 	}
 
-	public void addData(double value, int index) {
+	public void addDataOnIndex(double value, int index) {
 		this.data.add(index, value);
+	}
+
+	public void setDataOnIndex(double value, int index) {
+		this.data.set(index, value);
 	}
 
 	public boolean load(String fileName, String className, int width, int height) {
@@ -105,7 +109,7 @@ public class Sample {
 		this.className = className;
 		this.width = width;
 		this.height = height;
-		this.data = new ImageIO(fileName, width, height).getGreyImageData();
+		this.data = new ImageIO(fileName, this.width, this.height).getGreyImageData();
 
 		if (this.data == null) {
 			logger.debug(fileName + ": not able to get GreyImageData");

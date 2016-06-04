@@ -20,8 +20,6 @@ import org.jblas.DoubleMatrix;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import Jama.Matrix;
-
 /**
  * @author arunv
  *
@@ -31,13 +29,13 @@ public class SampleContainer {
 	static Logger logger = LoggerFactory.getLogger(SampleContainer.class);
 
 	private List<Sample> samples;
-	private Map<String, Boolean> diffClasses;
+	private Map<String, Integer> diffClasses;
 	private Sample avgSample;
 	ExecutorService executorService = Executors.newFixedThreadPool(50);
 
 	public SampleContainer() {
 		samples = new ArrayList<>();
-		diffClasses = new HashMap<String, Boolean>();
+		diffClasses = new HashMap<String, Integer>();
 		avgSample = new Sample();
 	}
 
@@ -62,6 +60,11 @@ public class SampleContainer {
 
 	public void addSample(Sample sample) {
 		this.samples.add(sample);
+
+		if (diffClasses.containsKey(sample.getClassName()))
+			diffClasses.put(sample.getClassName(), diffClasses.get(sample.getClassName()) + 1);
+		else
+			diffClasses.put(sample.getClassName(), 1);
 	}
 
 	public int getNumberOfClasses() {
@@ -72,7 +75,7 @@ public class SampleContainer {
 		return avgSample;
 	}
 
-	private void calculateAvgSample() {
+	public void calculateAvgSample() {
 		int i, j;
 
 		int dataSize = samples.get(0).getDataSize();
@@ -88,7 +91,7 @@ public class SampleContainer {
 			}
 		}
 		for (j = 0; j < dataSize; j++) {
-			avgSample.addData(tempData[j] / (samples.size()));
+			avgSample.setDataOnIndex(tempData[j] / (samples.size()), j);
 		}
 
 		tempData = null;
@@ -114,27 +117,128 @@ public class SampleContainer {
 			k++;
 		}
 		for (j = 0; j < dataSize; j++) {
-			avg.addData(tempData[j] / k);
+			//avg.addData(tempData[j] / k);
+			avg.setDataOnIndex(tempData[j] / k, j);
 		}
 		tempData = null;
 		return avg;
 	}
-
 
 	public DoubleMatrix getAsMatrix() {
 		int dataSize = samples.get(0).getDataSize();
 		int numSamples = samples.size();
 		DoubleMatrix mat = new DoubleMatrix(dataSize, numSamples);
 
-		//Column = Samples
+		// Column = Samples
 		for (int row = 0; row < dataSize; row++) {
-			for (int col = 0; row < numSamples; col++) {
+			for (int col = 0; col < numSamples; col++) {
 				mat.put(row, col, samples.get(col).getDataOfIndex(row));
 			}
 		}
 		return mat;
 	}
 
+	public DoubleMatrix getWithinClassVariance() {
+
+		int i, j, k;
+
+		int dataSize = samples.get(0).getDataSize();
+		int numSamples = samples.size();
+
+		DoubleMatrix wMat = DoubleMatrix.zeros(dataSize, dataSize);
+		Map<String, Sample> avgClassContainer = new HashMap<>();
+
+		for (String className : this.diffClasses.keySet()) {
+			avgClassContainer.put(className, getAvgSampleOfClass(className));
+		}
+
+		// within-class variance matrix
+		double[] tmp = new double[dataSize];
+
+		Sample tempSample = null;
+		Sample avgClassSample = null;
+
+		for (i = 0; i < numSamples; i++) {
+			tempSample = samples.get(i);
+			avgClassSample = avgClassContainer.get(tempSample.getClassName());
+			if (avgClassSample == null)
+				continue;
+			for (j = 0; j < dataSize; j++) {
+				tmp[j] = tempSample.getDataOfIndex(j) - avgClassSample.getDataOfIndex(j);
+			}
+			for (j = 0; j < dataSize; j++) {
+				for (k = 0; k < j; k++) {
+					wMat.put(j, k, wMat.get(j, k) + (tmp[j] * tmp[k]));
+					wMat.put(k, j, wMat.get(k, j) + (tmp[j] * tmp[k]));
+					// Or
+					// wMat.put(j, k, wMat.get(j, k) +
+					// ((tempSample.getDataOfIndex(j) -
+					// avgSample.getDataOfIndex(j))*(tempSample.getDataOfIndex(k)
+					// - avgSample.getDataOfIndex(k))));
+					// wMat.put(k, j, wMat.get(k, j) +
+					// ((tempSample.getDataOfIndex(j) -
+					// avgSample.getDataOfIndex(j))*(tempSample.getDataOfIndex(k)
+					// - avgSample.getDataOfIndex(k))));
+				}
+			}
+			for (j = 0; j < dataSize; j++)
+				wMat.put(j, j, (wMat.get(j, j) + (tmp[j] * tmp[j])));
+
+			tempSample = null;
+			avgClassSample = null;
+		}
+		avgClassContainer.clear();
+		tmp = null;
+		return wMat;
+	}
+
+	public DoubleMatrix getBetweenClassVariance() {
+
+		int j, k;
+
+		int dataSize = samples.get(0).getDataSize();
+
+		DoubleMatrix bMat = DoubleMatrix.zeros(dataSize, dataSize);
+
+		Map<String, Sample> avgClassContainer = new HashMap<>();
+
+		for (String className : this.diffClasses.keySet()) {
+			avgClassContainer.put(className, getAvgSampleOfClass(className));
+		}
+
+		// between-class variance matrix
+		double[] tmp = new double[dataSize];
+		Sample avgClassSample = null;
+
+		// between-class variance matrix
+		for (String className : this.diffClasses.keySet()) {
+			avgClassSample = avgClassContainer.get(className);
+			if (avgClassSample == null)
+				continue;
+
+			int classWiseSize = this.diffClasses.get(className);
+
+			for (j = 0; j < dataSize; j++) {
+				tmp[j] = (avgClassSample.getDataOfIndex(j)) - (getAvgSample().getDataOfIndex(j));
+			}
+			for (j = 0; j < dataSize; j++) {
+				for (k = 0; k < j; k++) {
+					bMat.put(j, k, bMat.get(j, k) + (classWiseSize * tmp[j] * tmp[k]));
+					bMat.put(k, j, bMat.get(k, j) + (classWiseSize * tmp[j] * tmp[k]));
+				}
+			}
+			for (j = 0; j < dataSize; j++)
+				bMat.put(j, j, bMat.get(j, j) + (classWiseSize * tmp[j] * tmp[j]));
+
+			avgClassSample = null;
+		}
+		avgClassContainer.clear();
+		tmp = null;
+		// Calling Garbage Collector..
+		logger.debug("Calling Garbage Collector in SampleContainer...");
+		System.gc();
+		return bMat;
+	}
 
 	public boolean load(String fileName, int width, int height) {
 		// Access File which contains Samples Information
@@ -184,7 +288,10 @@ public class SampleContainer {
 				if (sample.load(splitString[0], splitString[1], width, height)) {
 					synchronized (SampleLoader.class) {
 						samples.add(sample);
-						diffClasses.put(splitString[1], true);
+						if (diffClasses.containsKey(splitString[1]))
+							diffClasses.put(splitString[1], diffClasses.get(splitString[1]) + 1);
+						else
+							diffClasses.put(splitString[1], 1);
 					}
 				}
 			} else {

@@ -3,6 +3,7 @@
  */
 package uas.facerecognition.lblda.lib.local;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,18 +13,23 @@ import uas.facerecognition.lblda.lib.Subspace;
  * @author arunv
  *
  */
-public class LocalSubspace {
+public class LocalSubspace implements Serializable {
+
+	private static final transient long serialVersionUID = 1L;
 
 	private List<RegionDescriptor> localDescriptor;
 
 	private List<Subspace> localSubspaces;
 
+	private List<LocalFeature> localFeatures;
+
 	/**
 	 *
 	 */
 	public LocalSubspace() {
-		this.localDescriptor = null;
-		this.localSubspaces = null;
+		this.localDescriptor = new ArrayList<>();
+		this.localSubspaces = new ArrayList<>();
+		this.localFeatures = new ArrayList<>();
 	}
 
 	/**
@@ -48,19 +54,20 @@ public class LocalSubspace {
 		this.localDescriptor = localDescriptor;
 	}
 
-	public void setLocalDescriptorListSize(int size) {
-		this.localDescriptor = new ArrayList<>(size);
-	}
-
 	public void addDescriptor(RegionDescriptor descriptor) {
 		this.localDescriptor.add(descriptor);
 	}
 
-	/**
-	 * @return the localSubspaces
-	 */
+	// ############################
 	public List<Subspace> getLocalSubspaceList() {
 		return this.localSubspaces;
+	}
+
+	public Subspace getLocalSubspace(int index) {
+		if (this.localSubspaces != null) {
+			return this.localSubspaces.get(index);
+		}
+		return null;
 	}
 
 	public int getLocalSubspaceListSize() {
@@ -71,12 +78,32 @@ public class LocalSubspace {
 		this.localSubspaces = localSubspaces;
 	}
 
-	public void setLocalSubspaceListSize(int size) {
-		this.localSubspaces = new ArrayList<>(size);
-	}
-
 	public void addSubspace(Subspace subspace) {
 		this.localSubspaces.add(subspace);
+	}
+
+	// ############################
+	public List<LocalFeature> getLocalFeatureList() {
+		return this.localFeatures;
+	}
+
+	public LocalFeature getLocalFeature(int index) {
+		if (this.localFeatures != null) {
+			return this.localFeatures.get(index);
+		}
+		return null;
+	}
+
+	public int getLocalFeatureListSize() {
+		return this.localFeatures.size();
+	}
+
+	public void setLocalFeatureList(List<LocalFeature> localFeature) {
+		this.localFeatures = localFeature;
+	}
+
+	public void addLocalFeature(LocalFeature localFeature) {
+		this.localFeatures.add(localFeature);
 	}
 
 }

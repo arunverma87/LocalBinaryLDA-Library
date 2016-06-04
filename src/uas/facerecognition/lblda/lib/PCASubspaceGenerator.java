@@ -6,15 +6,10 @@ package uas.facerecognition.lblda.lib;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jblas.ComplexDouble;
-import org.jblas.ComplexDoubleMatrix;
 import org.jblas.DoubleMatrix;
 import org.jblas.Eigen;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import Jama.EigenvalueDecomposition;
-import Jama.Matrix;
 
 /**
  * @author arunv
@@ -54,34 +49,39 @@ public class PCASubspaceGenerator implements ISubspaceGenerator {
 
 		logger.debug("Computing Covariance Matrix");
 
-		DoubleMatrix STS = S.mmul(ST);
-		STS = STS.mul(1.00 / container.getSize());
+		DoubleMatrix SST = S.mmul(ST);
+		SST = SST.mul(1.00 / container.getSize());
 
 		logger.debug("Computing eigenvectors...");
-		// TODO :: Do we need to calculate actual eigenvectors?
-		ComplexDoubleMatrix calculatedEigenValues = Eigen.eigenvalues(STS);
-		ComplexDoubleMatrix calculatedEigenVectors = Eigen.eigenvectors(STS)[0];
+
+		DoubleMatrix[] calculatedEigenVectors = Eigen.symmetricEigenvectors(SST);
 
 		logger.debug("Saving subspace data...");
 
-		List<Double> eigenValues = new ArrayList<>(calculatedEigenValues.getLength());
-		for (ComplexDouble eigenvalue : calculatedEigenValues.toArray()) {
-			eigenValues.add(eigenvalue.abs());
-		}
-
-		List<Double> eigenVectors = new ArrayList<>(calculatedEigenVectors.getLength());
-		for (row = 0; row < calculatedEigenVectors.getRows(); row++) {
-			for (ComplexDouble value : calculatedEigenVectors.getRow(row).toArray()) {
-				eigenVectors.add(value.abs());
+		List<Double> eigenVectors = new ArrayList<>();
+		for (col = 0; col < calculatedEigenVectors[0].getColumns(); col++) {
+			for (double value : calculatedEigenVectors[0].getColumn(col).toArray()) {
+				eigenVectors.add(value);
 			}
 		}
+
+		List<Double> eigenValues = new ArrayList<>(calculatedEigenVectors[1].getRows());
+		for (row = 0; row < calculatedEigenVectors[1].getRows(); row++) {
+			eigenValues.set(row,calculatedEigenVectors[1].get(row,row));
+		}
+
+		calculatedEigenVectors = null;
+
+		//Calling Garbage Collector..
+		logger.debug("Calling Garbage Collector...");
+		System.gc();
 
 		pca.setSubspaceData(SubspaceType.SUBSPACE_PCA, n, n, avg.getData(), eigenVectors, eigenValues);
 		// }
 
-		pca.reorderDescending();
+		pca.sortInDescending(false);
 		pca.normalize();
-		pca.trim(N-1);
+		pca.retainAll(N - 1);
 
 		return pca;
 	}
