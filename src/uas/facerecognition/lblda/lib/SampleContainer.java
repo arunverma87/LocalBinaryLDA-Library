@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +35,6 @@ public class SampleContainer {
 	public SampleContainer() {
 		samples = new ArrayList<>();
 		diffClasses = new HashMap<String, Integer>();
-		avgSample = new Sample();
 	}
 
 	public void clear() {
@@ -72,18 +70,20 @@ public class SampleContainer {
 	}
 
 	public Sample getAvgSample() {
+		if (avgSample == null)
+			calculateAvgSample();
 		return avgSample;
 	}
 
 	public void calculateAvgSample() {
 		int i, j;
-
+		avgSample = new Sample();
 		int dataSize = samples.get(0).getDataSize();
 		avgSample.initAndSetDataSize(dataSize);
 
 		double[] tempData = new double[dataSize];
 
-		Arrays.fill(tempData, 0);
+		// Arrays.fill(tempData, 0);
 
 		for (i = 0; i < getSize(); i++) {
 			for (j = 0; j < dataSize; j++) {
@@ -91,7 +91,7 @@ public class SampleContainer {
 			}
 		}
 		for (j = 0; j < dataSize; j++) {
-			avgSample.setDataOnIndex(tempData[j] / (samples.size()), j);
+			avgSample.addData(tempData[j] / samples.size());
 		}
 
 		tempData = null;
@@ -106,7 +106,7 @@ public class SampleContainer {
 
 		double[] tempData = new double[dataSize];
 
-		Arrays.fill(tempData, 0);
+		// Arrays.fill(tempData, 0);
 
 		for (i = 0; i < getSize(); i++) {
 			if (!samples.get(i).getClassName().equals(className))
@@ -117,8 +117,8 @@ public class SampleContainer {
 			k++;
 		}
 		for (j = 0; j < dataSize; j++) {
-			//avg.addData(tempData[j] / k);
-			avg.setDataOnIndex(tempData[j] / k, j);
+			avg.addData(tempData[j] / k);
+			// avg.setDataOnIndex(tempData[j] / k, j);
 		}
 		tempData = null;
 		return avg;
@@ -289,7 +289,7 @@ public class SampleContainer {
 					synchronized (SampleLoader.class) {
 						samples.add(sample);
 						if (diffClasses.containsKey(splitString[1]))
-							diffClasses.put(splitString[1], diffClasses.get(splitString[1]) + 1);
+							diffClasses.put(splitString[1], (diffClasses.get(splitString[1]) + 1));
 						else
 							diffClasses.put(splitString[1], 1);
 					}

@@ -34,8 +34,10 @@ public class LDASubspaceGenerator implements ISubspaceGenerator {
 	@Override
 	public Subspace generateSubspace(SampleContainer container) {
 
+		logger.debug("LDASubspace Generator loaded..");
+
 		int N, n, noOfClasses;
-		int col;
+		int col,row;
 		// getting the problem dimensionality
 		N = container.getSize(); // number of samples
 		n = container.getSample(0).getDataSize(); // sample dimensionality
@@ -59,7 +61,7 @@ public class LDASubspaceGenerator implements ISubspaceGenerator {
 			if (genEigen == null)
 				return null;
 
-			List<Double> eigenVectors = new ArrayList<>();
+			List<Double> eigenVectors = new ArrayList<>(genEigen[0].length);
 			for (col = 0; col < genEigen[0].getColumns(); col++) {
 				for (double value : genEigen[0].getColumn(col).toArray()) {
 					eigenVectors.add(value);
@@ -68,7 +70,7 @@ public class LDASubspaceGenerator implements ISubspaceGenerator {
 
 			List<Double> eigenValues = new ArrayList<>(genEigen[1].getRows());
 			for (col = 0; col < genEigen[1].getColumns(); col++) {
-				eigenValues.set(0, genEigen[1].get(1, col));
+				eigenValues.add(genEigen[1].get(1, col));
 			}
 
 			genEigen = null;
@@ -80,7 +82,7 @@ public class LDASubspaceGenerator implements ISubspaceGenerator {
 			if (pcaDimension == 0)
 				pcaDimension = N - noOfClasses;
 
-			logger.debug("Performing PCA..");
+			logger.debug("Performing PCA first. why?");
 
 			Subspace pcaSubspace;
 			Subspace ldaSubspace = new Subspace();
@@ -105,16 +107,20 @@ public class LDASubspaceGenerator implements ISubspaceGenerator {
 			if (genEigen == null)
 				return null;
 
-			List<Double> eigenVectors = new ArrayList<>();
+			logger.debug("Generalized EigenVector total length: "+ genEigen[0].length + ". Columns: " +  genEigen[0].getColumns());
+
+			List<Double> eigenVectors = new ArrayList<>(genEigen[0].length);
 			for (col = 0; col < genEigen[0].getColumns(); col++) {
 				for (double value : genEigen[0].getColumn(col).toArray()) {
 					eigenVectors.add(value);
 				}
 			}
 
+			logger.debug("Generalized Eigen Values: " +  genEigen[1].getColumns() + " and  Rows: " + genEigen[1].getRows());
+
 			List<Double> eigenValues = new ArrayList<>(genEigen[1].getRows());
-			for (col = 0; col < genEigen[1].getColumns(); col++) {
-				eigenValues.set(0, genEigen[1].get(1, col));
+			for (row = 0; row < genEigen[1].getRows(); row++) {
+				eigenValues.add(genEigen[1].get(row,0));
 			}
 
 			genEigen = null;
@@ -123,30 +129,35 @@ public class LDASubspaceGenerator implements ISubspaceGenerator {
 
 			ldaSubspace.setSubspaceData(SubspaceType.SUBSPACE_LDA, pcaDimension, pcaDimension, avg, eigenVectors,
 					eigenValues);
-
 			ldaSubspace.sortInDescending(true);
 
 			logger.debug("Computing final subspace...");
 
 			DoubleMatrix matPCA = pcaSubspace.getSubspaceAxesAsMatrix(pcaDimension, n);
-
 			DoubleMatrix matLDA = ldaSubspace.getSubspaceAxesAsMatrix(pcaDimension, pcaDimension);
-
 			DoubleMatrix matFinal = matLDA.mmul(matPCA);
 
 			List<Double> finalData = new ArrayList<>(matFinal.length);
-			for (int i = 0; i < matFinal.length; i++)
-				finalData.set(i, matFinal.get(i));
 
+			for (row = 0; row < matFinal.getRows(); row++) {
+				for (col = 0; col < matFinal.getColumns(); col++) {
+					finalData.add(matFinal.get(row,col));
+				}
+			}
+
+			logger.debug("Saving final subspace of " + SubspaceType.SUBSPACE_LDA);
 			retSubspace.setSubspaceData(SubspaceType.SUBSPACE_LDA, pcaDimension, n, pcaSubspace.getCenterOffset(),
 					finalData, ldaSubspace.getAxesCriterionFn());
 		}
 
+		logger.debug("Sorting SubspceAxes and AxesCriteria Function in descending order..");
 		retSubspace.sortInDescending(true);
+		logger.debug("Normalizing Subspaces..");
 		retSubspace.normalize();
+		logger.debug("Trimming Subspaces to " + (noOfClasses-1) + " length.");
 		retSubspace.retainAll(noOfClasses - 1);
 
-		return null;
+		return retSubspace;
 	}
 
 }

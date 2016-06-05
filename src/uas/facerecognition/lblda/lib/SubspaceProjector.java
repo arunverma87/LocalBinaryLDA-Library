@@ -17,9 +17,6 @@ public class SubspaceProjector {
 
 	public Sample projectSample(Sample originalSample, int dim) {
 
-		if (dim == 0 || dim > this.subspace.getSubspaceDim())
-			dim = subspace.getSubspaceDim();
-
 		Sample projectedSample = new Sample();
 		projectedSample.initAndSetDataSize(dim);
 
@@ -29,7 +26,7 @@ public class SubspaceProjector {
 			sum = 0;
 			for (j = 0; j < originalSample.getDataSize(); j++) {
 				sum += (originalSample.getDataOfIndex(j) - subspace.getCenterOffset().get(j))
-						* subspace.getSubspaceAxes().get(i * subspace.getOriginalDim() + j);
+						* subspace.getSubspaceAxes().get((i * subspace.getOriginalDim()) + j);
 				// sum += ((*originalSample)[j] - subspace->centerOffset[j]) *
 				// subspace->subspaceAxes[i*subspace->originalDim+j];
 			}
@@ -42,6 +39,9 @@ public class SubspaceProjector {
 
 	public SampleContainer projectSampleContainer(SampleContainer originalSampleContainer, int dim) {
 
+		if (dim > this.subspace.getSubspaceDim())
+			dim = this.subspace.getSubspaceDim();
+
 		SampleContainer projectedContainer = new SampleContainer();
 
 		int totalSamples = originalSampleContainer.getSize();
@@ -53,7 +53,7 @@ public class SubspaceProjector {
 			if (projectedSample != null)
 				projectedContainer.addSample(projectedSample);
 		}
-		//Calculating Average
+		// Calculating Average
 		projectedContainer.calculateAvgSample();
 
 		return projectedContainer;

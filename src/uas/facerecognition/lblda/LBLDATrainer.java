@@ -3,11 +3,12 @@
  */
 package uas.facerecognition.lblda;
 
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +53,6 @@ public class LBLDATrainer {
 	}
 
 	public boolean loadSamples() {
-
 		if (!trainSamples.load(imageFilePath, imageWidth, imageHeight)) {
 			return false;
 		}
@@ -61,23 +61,16 @@ public class LBLDATrainer {
 	}
 
 	public void createSubSpace() {
-
 		logger.info("Creating Subspace");
-
 		ISubspaceGenerator subGenerator = new LDASubspaceGenerator(this.pcaDimension);
-
 		LocalSubspaceGenerator localSubpaceGenerator = new LocalSubspaceGenerator(subGenerator, imageWidth, imageHeight,
 				windowSize, stepSize, outputDimension);
-
-		// generate subspace
+		//generate subspace
 		this.localSubspace = localSubpaceGenerator.generateSubspace(trainSamples);
-
 		subGenerator = null;
-
 	}
 
 	public void saveSubSpace() {
-
 		String savePath = this.imageFilePath.substring(0, this.imageFilePath.lastIndexOf(".")) + ".dat";
 		serializeData(savePath);
 	}
@@ -85,10 +78,13 @@ public class LBLDATrainer {
 	public void serializeData(String path) {
 		System.out.println("Starting serialization...");
 		try {
+
 			FileOutputStream fileOut = new FileOutputStream(path);
 			ObjectOutputStream out = new ObjectOutputStream(fileOut);
+
 			out.writeObject(this.localSubspace);
 			out.close();
+
 			fileOut.close();
 			System.out.println("Serialization Successful... Checkout " + path + " output file..");
 
@@ -98,4 +94,26 @@ public class LBLDATrainer {
 			e.printStackTrace();
 		}
 	}
+
+	public void deSerializeData(String path) {
+		System.out.println("Starting deSerialization...");
+		try {
+			FileInputStream fileIn = new FileInputStream(path);
+			ObjectInputStream in = new ObjectInputStream(fileIn);
+			try {
+				this.localSubspace = (LocalSubspace) in.readObject();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+			System.out.println("Deserialized Data from " + path);
+			in.close();
+			fileIn.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+
 }

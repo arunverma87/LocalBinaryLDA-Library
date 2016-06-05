@@ -175,7 +175,8 @@ public class LocalSubspaceGenerator {
 				for (int i = 0; i < (this.numFeatures - featuresList.size()); i++)
 					featuresList.add(null);
 			} else if (featuresList.size() > this.numFeatures) {
-				featuresList = featuresList.subList(0, this.numFeatures);
+				//featuresList = featuresList.subList(0, );
+				featuresList.subList(this.numFeatures, featuresList.size()).clear();
 			}
 			localSubspaces.setLocalFeatureList(featuresList);
 

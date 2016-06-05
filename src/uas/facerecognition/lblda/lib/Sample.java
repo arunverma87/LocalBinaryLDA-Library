@@ -99,10 +99,6 @@ public class Sample {
 		this.data.add(index, value);
 	}
 
-	public void setDataOnIndex(double value, int index) {
-		this.data.set(index, value);
-	}
-
 	public boolean load(String fileName, String className, int width, int height) {
 
 		this.fileName = fileName;

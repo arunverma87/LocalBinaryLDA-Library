@@ -24,9 +24,6 @@ public class Subspace implements Serializable {
 	private List<Double> subspaceAxes;
 	private List<Double> axesCriterionFn;
 
-	/**
-	 *
-	 */
 	public Subspace() {
 		type = null;
 		subspaceDim = 0;
@@ -83,55 +80,68 @@ public class Subspace implements Serializable {
 	public void normalize() {
 
 		double norm;
-		int i, j;
-		for (i = 0; i < subspaceDim; i++) {
-			double sum = 0;
-			for (j = 0; j < originalDim; j++) {
-				sum += subspaceAxes.get(i * originalDim + j) * subspaceAxes.get(i * originalDim + j);
+		int i = 0, j = 0;
+		try {
+			for (i = 0; i < subspaceDim; i++) {
+				double sum = 0;
+				for (j = 0; j < originalDim; j++) {
+					sum += subspaceAxes.get((i * originalDim) + j) * subspaceAxes.get((i * originalDim) + j);
+				}
+				if (sum < 0)
+					continue;
+				norm = Math.sqrt(sum);
+				if (norm == 0)
+					continue;
+				for (j = 0; j < originalDim; j++) {
+					subspaceAxes.set((i * originalDim) + j, (subspaceAxes.get((i * originalDim) + j) / norm));
+				}
 			}
-			norm = Math.sqrt(sum);
-			if (norm == 0)
-				continue;
-			for (j = 0; j < originalDim; j++) {
-				subspaceAxes.set(i * originalDim + j, subspaceAxes.get(i * originalDim + j) / norm);
-			}
+		} catch (Exception ex) {
+			System.out.println("Exception occured: " + i + "," + j);
+			ex.printStackTrace();
+			System.out.println("SubspaceAxes Length: " + subspaceAxes.size() + " SubspaceDim: " + subspaceDim
+					+ " OriginalDim: " + originalDim);
 		}
-
 	}
 
 	public void sortInDescending(boolean usingAbs) {
 		int i, j;
 		double max, tmpd;
 		int maxi;
+		// System.out.println(
+		// "Start AxesCriterionFn: " + axesCriterionFn.size() + " SubspaceAxes:
+		// " + subspaceAxes.size());
 		for (i = 0; i < subspaceDim; i++) {
 			max = axesCriterionFn.get(i);
 			maxi = i;
 			for (j = i + 1; j < subspaceDim; j++) {
-				if (!usingAbs)
+				if (!usingAbs) {
 					if (axesCriterionFn.get(j) > max) {
 						max = axesCriterionFn.get(j);
 						maxi = j;
-					} else if (Math.abs(axesCriterionFn.get(j)) > Math.abs(max)) {
+					}
+				} else {
+					if (Math.abs(axesCriterionFn.get(j)) > Math.abs(max)) {
 						max = axesCriterionFn.get(j);
 						maxi = j;
 					}
+				}
 			}
 			if (maxi != i) {
 
-				List<Double> temp = subspaceAxes.subList((i * originalDim), (i * originalDim) + originalDim);
-
 				for (int setI = 0; setI < originalDim; setI++) {
+					tmpd = subspaceAxes.get(setI + (i * originalDim));
 					subspaceAxes.set(setI + (i * originalDim), subspaceAxes.get(setI + (maxi * originalDim)));
-					subspaceAxes.set(setI + (maxi * originalDim), temp.get(setI));
+					subspaceAxes.set(setI + (maxi * originalDim), tmpd);
 				}
-				temp.clear();
-				temp = null;
-
 				tmpd = axesCriterionFn.get(i);
 				axesCriterionFn.set(i, axesCriterionFn.get(maxi));
 				axesCriterionFn.set(maxi, tmpd);
 			}
 		}
+		System.out.println("End AxesCriterionFn: " + axesCriterionFn.size() + " SubspaceAxes: " + subspaceAxes.size());
+		// System.out.println("i: " + i + " SubspaceDim: " + subspaceDim);
+
 	}
 
 	public void retainAll(int dim) {

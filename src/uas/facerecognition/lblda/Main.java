@@ -18,20 +18,24 @@ public class Main implements IConstant {
 	public static void main(String[] args) {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
-		logger.debug("OpenCV library loaded successfully");
+		logger.info("OpenCV library loaded successfully");
 		String filePath = "TrainAll.txt";
-
-		logger.info("Training started..");
+		logger.info("Subspace Generation start..");
+		long startTime = System.currentTimeMillis();
 
 		// LBLDA trainer and call load method of it
 		LBLDATrainer trainer = new LBLDATrainer(filePath, IMAGE_WIDTH, IMAGE_HEIGHT, STEP_SIZE, WINDOW_SIZE,
 				PCA_DIMENSION, OUTPUT_DIMENSION);
-		if (trainer.loadSamples()) {
+		// if (trainer.loadSamples()) {
+		// trainer.createSubSpace();
+		// trainer.saveSubSpace();
+		// }
 
-			trainer.createSubSpace();
+		String subspacePath = filePath.substring(0, filePath.lastIndexOf(".")) + "1.dat";
+		trainer.deSerializeData(subspacePath);
 
-			trainer.saveSubSpace();
-
-		}
+		long endTime = System.currentTimeMillis();
+		double timeElapsed = ((endTime - startTime) / 1000.0);
+		logger.info("Subspace Generatiion finished in " + timeElapsed + " sec");
 	}
 }
