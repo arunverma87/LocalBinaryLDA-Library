@@ -26,13 +26,14 @@ public class Main implements IConstant {
 		// LBLDA trainer and call load method of it
 		LBLDATrainer trainer = new LBLDATrainer(filePath, IMAGE_WIDTH, IMAGE_HEIGHT, STEP_SIZE, WINDOW_SIZE,
 				PCA_DIMENSION, OUTPUT_DIMENSION);
-		// if (trainer.loadSamples()) {
-		// trainer.createSubSpace();
-		// trainer.saveSubSpace();
-		// }
+		if (trainer.loadSamples()) {
+			trainer.createSubSpace();
+			trainer.saveSubSpace();
+		}
 
-		String subspacePath = filePath.substring(0, filePath.lastIndexOf(".")) + "1.dat";
-		trainer.deSerializeData(subspacePath);
+		// String subspacePath = filePath.substring(0,
+		// filePath.lastIndexOf(".")) + "1.dat";
+		// trainer.deSerializeData(subspacePath);
 
 		long endTime = System.currentTimeMillis();
 		double timeElapsed = ((endTime - startTime) / 1000.0);
